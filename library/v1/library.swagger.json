@@ -5,7 +5,7 @@
     "description": "Awesome API description right here. Could be longer, could be shorter.",
     "version": "1.0"
   },
-  "host": "us.sms.api.sinch.com",
+  "host": "us.book.api.sinch.com",
   "basePath": "/library",
   "consumes": [
     "application/json"
@@ -14,6 +14,49 @@
     "application/json"
   ],
   "paths": {
+    "/v1/apps/{app_id}/books/{book.book_id}": {
+      "put": {
+        "summary": "Update book",
+        "description": "Updates a book. Returns INVALID_ARGUMENT if the name of the book\nis non-empty and does not equal the existing name.\n\nUpdateBook is a call with the method(s) PUT within the \"LibraryService\" service.\nIt takes in \"UpdateBookRequest\" and returns a \"Book\".\n\n## UpdateBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | app_id | TYPE_STRING | The name of the book to update. | \n| 2 | book | TYPE_MESSAGE | The book to update with. The name must match or be empty. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | book_id | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
+        "operationId": "UpdateBook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Book"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "app_id",
+            "description": "The name of the book to update.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "book.book_id",
+            "description": "The resource name of the book.\nBook names have the form `shelves/{shelf_id}/books/{book_id}`.\nThe name is ignored when creating a book.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "description": "The book to update with. The name must match or be empty.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Book"
+            }
+          }
+        ],
+        "tags": [
+          "Books"
+        ]
+      }
+    },
     "/v1/shelves": {
       "get": {
         "summary": "List shelves",
@@ -29,7 +72,7 @@
         },
         "parameters": [
           {
-            "name": "pageSize",
+            "name": "page_size",
             "description": "Requested page size. Server may return fewer shelves than requested.\nIf unspecified, server will pick an appropriate default.",
             "in": "query",
             "required": false,
@@ -37,7 +80,7 @@
             "format": "int32"
           },
           {
-            "name": "pageToken",
+            "name": "page_token",
             "description": "A token identifying a page of results the server should return.\nTypically, this is the value of\n[ListShelvesResponse.next_page_token][google.example.library.v1.ListShelvesResponse.next_page_token]\nreturned from the previous call to `ListShelves` method.",
             "in": "query",
             "required": false,
@@ -78,7 +121,7 @@
     "/v1/shelves/books/{name}": {
       "get": {
         "summary": "Get book",
-        "description": "Gets a book. Returns NOT_FOUND if the book does not exist.\n\nGetBook is a call with the method(s) GET within the \"LibraryService\" service.\nIt takes in \"GetBookRequest\" and returns a \"Book\".\n\n## GetBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | name | TYPE_STRING | The name of the book to retrieve. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | name | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
+        "description": "Gets a book. Returns NOT_FOUND if the book does not exist.\n\nGetBook is a call with the method(s) GET within the \"LibraryService\" service.\nIt takes in \"GetBookRequest\" and returns a \"Book\".\n\n## GetBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | name | TYPE_STRING | The name of the book to retrieve. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | book_id | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
         "operationId": "GetBook",
         "responses": {
           "200": {
@@ -99,6 +142,11 @@
         ],
         "tags": [
           "Books"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
@@ -125,46 +173,12 @@
         "tags": [
           "Books"
         ]
-      },
-      "put": {
-        "summary": "Update book",
-        "description": "Updates a book. Returns INVALID_ARGUMENT if the name of the book\nis non-empty and does not equal the existing name.\n\nUpdateBook is a call with the method(s) PUT within the \"LibraryService\" service.\nIt takes in \"UpdateBookRequest\" and returns a \"Book\".\n\n## UpdateBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | name | TYPE_STRING | The name of the book to update. | \n| 2 | book | TYPE_MESSAGE | The book to update with. The name must match or be empty. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | name | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
-        "operationId": "UpdateBook",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Book"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "name",
-            "description": "The name of the book to update.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "description": "The book to update with. The name must match or be empty.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1Book"
-            }
-          }
-        ],
-        "tags": [
-          "Books"
-        ]
       }
     },
     "/v1/shelves/books/{name}:move": {
       "post": {
         "summary": "Move book",
-        "description": "Moves a book to another shelf, and returns the new book. The book\nid of the new book may not be the same as the original book.\n\nMoveBook is a call with the method(s) POST within the \"LibraryService\" service.\nIt takes in \"MoveBookRequest\" and returns a \"Book\".\n\n## MoveBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | name | TYPE_STRING | The name of the book to move. | \n| 2 | other_shelf_name | TYPE_STRING | The name of the destination shelf. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | name | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
+        "description": "Description MoveBook",
         "operationId": "MoveBook",
         "responses": {
           "200": {
@@ -193,7 +207,12 @@
         ],
         "tags": [
           "Books"
-        ]
+        ],
+        "deprecated": true,
+        "externalDocs": {
+          "description": "Find out more MoveBook",
+          "url": "https://developers.sinch.com/docs"
+        }
       }
     },
     "/v1/shelves/{name}": {
@@ -291,7 +310,7 @@
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "page_size",
             "description": "Requested page size. Server may return fewer books than requested.\nIf unspecified, server will pick an appropriate default.",
             "in": "query",
             "required": false,
@@ -299,7 +318,7 @@
             "format": "int32"
           },
           {
-            "name": "pageToken",
+            "name": "page_token",
             "description": "A token identifying a page of results the server should return.\nTypically, this is the value of\n[ListBooksResponse.next_page_token][google.example.library.v1.ListBooksResponse.next_page_token].\nreturned from the previous call to `ListBooks` method.",
             "in": "query",
             "required": false,
@@ -312,7 +331,7 @@
       },
       "post": {
         "summary": "Create book",
-        "description": "Creates a book, and returns the new Book.\n\nCreateBook is a call with the method(s) POST within the \"LibraryService\" service.\nIt takes in \"CreateBookRequest\" and returns a \"Book\".\n\n## CreateBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | name | TYPE_STRING | The name of the shelf in which the book is created. | \n| 2 | book | TYPE_MESSAGE | The book to create. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | name | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
+        "description": "Creates a book, and returns the new Book.\n\nCreateBook is a call with the method(s) POST within the \"LibraryService\" service.\nIt takes in \"CreateBookRequest\" and returns a \"Book\".\n\n## CreateBookRequest\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------  | ---------------------------- | \n| 1 | name | TYPE_STRING | The name of the shelf in which the book is created. | \n| 2 | book | TYPE_MESSAGE | The book to create. | \n\n## Book\n| Field ID    | Name      | Type                                                       | Description                  |\n| ----------- | --------- | ---------------------------------------------------------- | ---------------------------- | \n| 1 | book_id | TYPE_STRING | The resource name of the book.\u003cbr\u003eBook names have the form `shelves/{shelf_id}/books/{book_id}`.\u003cbr\u003eThe name is ignored when creating a book. | \n| 2 | author | TYPE_STRING | The name of the book author. | \n| 3 | title | TYPE_STRING | The title of the book. | \n| 4 | read | TYPE_BOOL | Value indicating whether the book has been read. |",
         "operationId": "CreateBook",
         "responses": {
           "200": {
@@ -411,12 +430,13 @@
   "definitions": {
     "v1Book": {
       "type": "object",
+      "default": "20",
       "properties": {
-        "name": {
+        "book_id": {
           "type": "string",
           "description": "The resource name of the book.\nBook names have the form `shelves/{shelf_id}/books/{book_id}`.\nThe name is ignored when creating a book."
         },
-        "writer": {
+        "author": {
           "type": "string",
           "description": "The name of the book author."
         },
@@ -430,12 +450,8 @@
           "description": "Value indicating whether the book has been read."
         }
       },
-      "description": "Sets a new description in the swagger. Overwrites the previous one",
-      "title": "MyBook",
-      "required": [
-        "name",
-        "title"
-      ]
+      "description": "A single book in the library.",
+      "title": "A book"
     },
     "v1Category": {
       "type": "string",
@@ -477,7 +493,7 @@
           },
           "description": "The list of books."
         },
-        "nextPageToken": {
+        "next_page_token": {
           "type": "string",
           "description": "A token to retrieve next page of results.\nPass this value in the\n[ListBooksRequest.page_token][google.example.library.v1.ListBooksRequest.page_token]\nfield in the subsequent call to `ListBooks` method to retrieve the next\npage of results."
         }
@@ -494,7 +510,7 @@
           },
           "description": "The list of shelves."
         },
-        "nextPageToken": {
+        "next_page_token": {
           "type": "string",
           "description": "A token to retrieve next page of results.\nPass this value in the\n[ListShelvesRequest.page_token][google.example.library.v1.ListShelvesRequest.page_token]\nfield in the subsequent call to `ListShelves` method to retrieve the next\npage of results."
         }
@@ -508,7 +524,7 @@
           "type": "string",
           "description": "The name of the shelf we're adding books to."
         },
-        "otherShelfName": {
+        "other_shelf_name": {
           "type": "string",
           "description": "The name of the shelf we're removing books from and deleting."
         }
@@ -522,7 +538,7 @@
           "type": "string",
           "description": "The name of the book to move."
         },
-        "otherShelfName": {
+        "other_shelf_name": {
           "type": "string",
           "description": "The name of the destination shelf."
         }
@@ -552,14 +568,14 @@
           "type": "string",
           "title": "The theme of the shelf, this description will become a title in the swagger\nbecause we are missing an ending '.' at this line in the .proto"
         },
-        "repeatedEnumValue": {
+        "repeated_enum_value": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1NumericEnum"
           },
           "description": "repeated enum value. it is comma-separated in query."
         },
-        "repeatedEnumAnnotation": {
+        "repeated_enum_annotation": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1NumericEnum"
@@ -567,7 +583,7 @@
           "description": "Repeated numeric enum description.",
           "title": "Repeated numeric enum title"
         },
-        "enumValueAnnotation": {
+        "enum_value_annotation": {
           "$ref": "#/definitions/v1NumericEnum",
           "description": "Numeric enum description.",
           "title": "Numeric enum title"
@@ -577,6 +593,18 @@
       "title": "Shelf"
     }
   },
-  "x-explorer-enabled": true,
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "x-explorer-enabled": false,
   "x-samples-enabled": true
 }

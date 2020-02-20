@@ -17,11 +17,11 @@ syntax = "proto3";
 
 package google.example.library.v1;
 
-//import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 import "google/api/annotations.proto";
 import "google/api/resource.proto";
 import "google/protobuf/empty.proto";
-import "options/annotations.proto";
+//import "options/annotations.proto";
 
 
 option go_package = "google.golang.org/genproto/googleapis/example/library/v1;library";
@@ -29,18 +29,34 @@ option java_multiple_files = true;
 option java_outer_classname = "LibraryProto";
 option java_package = "com.google.example.library.v1";
 
-option (_swagger.options.openapiv2_swagger) = {
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
   info: {
     title: "Library Example API";
     version: "1.0";
     description: "Awesome API description right here. Could be longer, could be shorter."
   };
-  host: "us.sms.api.sinch.com"
+  security_definitions: {
+    security: {
+      key: "Bearer";
+      value: {
+        type: TYPE_API_KEY;
+        name: "Authorization";
+        in: IN_HEADER
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "Bearer";
+      value: {};
+    }
+  }
+  host: "us.book.api.sinch.com"
   base_path: "/library";
   extensions: {
     key: "x-explorer-enabled"
     value {
-      bool_value: true;
+      bool_value: false;
     }
   }
   extensions: {
@@ -63,7 +79,7 @@ option (_swagger.options.openapiv2_swagger) = {
 //
 // {{import ./library/v1/another.md}}
 service LibraryService {
-  option (_swagger.options.openapiv2_tag) = {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_tag) = {
     description: "This will overwrite the description of the service in OAS2"
     external_docs: {
       url: "developers.sinch.com"
@@ -83,7 +99,7 @@ service LibraryService {
       post: "/v1/shelves"
       body: "*"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Shelves";
       operation_id: "createShelf";
     };
@@ -101,7 +117,7 @@ service LibraryService {
     option (google.api.http) = {
       get: "/v1/{name}"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Shelves";
     };
   }
@@ -119,7 +135,7 @@ service LibraryService {
     option (google.api.http) = {
       get: "/v1/shelves"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Shelves";
     };
   }
@@ -136,7 +152,7 @@ service LibraryService {
     option (google.api.http) = {
       delete: "/v1/shelves/{name}"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Shelves";
     };
   }
@@ -160,7 +176,7 @@ service LibraryService {
       post: "/v1/shelves/{name}:merge"
       body: "*"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Shelves";
     };
   }
@@ -178,7 +194,7 @@ service LibraryService {
       post: "/v1/shelves/{name}/books"
       body: "book"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Books";
     };
   }
@@ -195,8 +211,14 @@ service LibraryService {
     option (google.api.http) = {
       get: "/v1/shelves/books/{name}"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Books";
+      security: {
+        security_requirement: {
+          key: "Bearer";
+          value: {}
+        }
+      }
     };
   }
 
@@ -214,7 +236,7 @@ service LibraryService {
     option (google.api.http) = {
       get: "/v1/shelves/{name}/books"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Books";
       responses: {
         key: "200";
@@ -255,7 +277,7 @@ service LibraryService {
     option (google.api.http) = {
       delete: "/v1/shelves/books/{name}"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Books";
     };
   }
@@ -271,10 +293,10 @@ service LibraryService {
   // {{import "./library/v1/tables.md"}}
   rpc UpdateBook(UpdateBookRequest) returns (Book) {
     option (google.api.http) = {
-      put: "/v1/shelves/books/{name}"
+      put: "/v1/apps/{app_id}/books/{book.book_id=book_id}"
       body: "book"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Books";
     };
   }
@@ -293,19 +315,25 @@ service LibraryService {
       post: "/v1/shelves/books/{name}:move"
       body: "*"
     };
-    option (_swagger.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Books";
+      deprecated: true;
+      description: "Description MoveBook"; //Overwrites description in proto
+      external_docs: {
+        url: "https://developers.sinch.com/docs";
+        description: "Find out more MoveBook";
+      }
     };
   }
 }
 
+// A book
+//
 // A single book in the library.
 message Book {
-  option (_swagger.options.openapiv2_schema) = {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {
-        title: "MyBook"
-        description: "Sets a new description in the swagger. Overwrites the previous one"
-        required: ["name", "title"]
+        default: "20"
     }
 };
   option (google.api.resource) = {
@@ -315,10 +343,10 @@ message Book {
   // The resource name of the book.
   // Book names have the form `shelves/{shelf_id}/books/{book_id}`.
   // The name is ignored when creating a book.
-  string name = 1;
+  string book_id = 1;
 
   // The name of the book author.
-  string author = 2 [json_name = "writer"];
+  string author = 2;
 
   // The title of the book.
   string title = 3;
@@ -329,7 +357,7 @@ message Book {
 
 // A Shelf contains a collection of books with a theme.
 message Shelf {
-  option (_swagger.options.openapiv2_schema) = {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {
       title: "Shelf"
     }
@@ -342,7 +370,7 @@ message Shelf {
   // Shelf names have the form `shelves/{shelf_id}`.
   // The name is ignored when creating a shelf.
   string name = 1 [
-    (_swagger.options.openapiv2_field) = {
+    (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
       description: "Resource name of the shelf. Overwrites description from proto"
       required: ['name']
     }
@@ -360,7 +388,7 @@ message Shelf {
 
   // repeated numeric enum comment (This comment is overridden by the field annotation, visible in table).
   repeated NumericEnum repeated_enum_annotation = 4 [
-  (_swagger.options.openapiv2_field) = {
+  (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
     title: "Repeated numeric enum title",
     description: "Repeated numeric enum description."
     }
@@ -368,7 +396,7 @@ message Shelf {
 
   // numeric enum comment (This comment is overridden by the field annotation, visible in table).
   NumericEnum enum_value_annotation = 5 [
-  (_swagger.options.openapiv2_field) = {
+  (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
     title: "Numeric enum title",
     description: "Numeric enum description."
     }
@@ -386,13 +414,13 @@ enum NumericEnum {
 
 // Request message for LibraryService.CreateShelf.
 message CreateShelfRequest {
-  option (_swagger.options.openapiv2_schema) = {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {
         required: ["shelf"]
     }
 };
   // The shelf to create.
-  Shelf shelf = 1[(_swagger.options.openapiv2_field) = {
+  Shelf shelf = 1[(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
     required: "true"
     }];
 
@@ -502,7 +530,7 @@ message ListBooksResponse {
 // Request message for LibraryService.UpdateBook.
 message UpdateBookRequest {
   // The name of the book to update.
-  string name = 1;
+  string app_id = 1;
 
   // The book to update with. The name must match or be empty.
   Book book = 2;
