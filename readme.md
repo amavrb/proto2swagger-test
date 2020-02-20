@@ -1,6 +1,6 @@
 This produces a swagger file when run from the projects root folder.
 
-`protoc --swagger_out=logtostderr=true,json_names_for_fields=true:. -I/Users/path/to/googleapis -I. library/*/*.proto`
+`protoc --swagger_out=logtostderr=true,,use_go_templates=true:. -I/Users/path/to/googleapis -I. library/*/*.proto`
 
 Where we can set flags by:
 `--<tool_suffix>_out=<flags>:<path>`
