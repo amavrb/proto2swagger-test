@@ -1,6 +1,6 @@
 This produces a swagger file when run from the projects root folder.
 
-`protoc --swagger_out=logtostderr=true,,use_go_templates=true:. -I/Users/path/to/googleapis -I. library/*/*.proto`
+`protoc --swagger_out=logtostderr=true,use_go_templates=true:. -I/Users/amavrb/git/googleapis -I. library/*/*.proto`
 
 Where we can set flags by:
 `--<tool_suffix>_out=<flags>:<path>`
@@ -359,8 +359,65 @@ service LibraryService {
 
 ### Field Options
 
+#### required and description
+
+```java
+// A book
+//
+// A single book in the library.
+message Book {
+  ...
+  // The resource name of the book.
+  // Book names have the form `shelves/{shelf_id}/books/{book_id}`.
+  // The name is ignored when creating a book.
+  string book_id = 1 [
+    (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
+      description: "Resource name of the book. Overwrites description from proto"
+      required: ['book_id']
+    }
+  ];
+
+  // The name of the book author.
+  string author = 2;
+
+  // The title of the book.
+  string title = 3;
+
+  // Value indicating whether the book has been read.
+  bool read = 4;
+}
+```
+
 | Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
 | :--: | :---: | :---------: | :-----------: | :-: | -- |
+| required   |   |   |   |  N  | Is not supported for properties in OAS2/OAS3 |
+| description   | |   |   | Y  |   |
+
+#### array minItems, maxItems
+
+```java
+// Request message for LibraryService.CreateShelf.
+message CreateShelfRequest {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+        required: ["shelf"]
+    }
+};
+  // The shelf to create.
+  repeated Shelf shelf = 1[(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
+      min_items: 1,
+      max_items: 400
+    }];
+
+  // First category for the shelf.
+  Category firstCategory = 2;
+}
+```
+
+| Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
+| :--: | :---: | :---------: | :-----------: | :-: | -- |
+|  minItems/maxItems  |   | ![](./images/array-min-max-res.png)  |   |  N  | min and max items are not shown at all in readme. |
+|    | |   |   |   |   |
 
 ### Bonus
 
