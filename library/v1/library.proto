@@ -21,6 +21,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "google/api/annotations.proto";
 import "google/api/resource.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 //import "options/annotations.proto";
 
 
@@ -325,17 +326,62 @@ service LibraryService {
       }
     };
   }
+
+  // Get settings for user
+  //
+  // Get the user settings.
+  rpc GetSettings(GetSettingsRequest) returns (Settings) {
+    option (google.api.http) = {
+      get: "/v1/{name}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "Settings";
+    };
+  }
+
+  // Update user settings
+  //
+  // Updates the user settings.
+  rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
+    option (google.api.http) = {
+      patch: "/v1/{settings.name}"
+      body: "settings"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "Settings";
+    };
+  }
+}
+
+// Settings
+//
+// The settings object
+message Settings {
+  string name = 1;
+  // Settings fields omitted.
+}
+
+// Get settings
+//
+// Get settings for a user
+message GetSettingsRequest {
+  string name = 1;
+}
+
+// Update settings
+//
+// Update settings for a user
+message UpdateSettingsRequest {
+  Settings settings = 1;
+  // Field mask to support partial updates.
+  google.protobuf.FieldMask update_mask = 2;
 }
 
 // A book
 //
 // A single book in the library.
 message Book {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    json_schema: {
-        default: "20"
-    }
-};
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { };
   option (google.api.resource) = {
     type: "library-example.googleapis.com/Book",
     pattern: "shelves/{shelf_id}/books/{book_id}"
@@ -343,7 +389,12 @@ message Book {
   // The resource name of the book.
   // Book names have the form `shelves/{shelf_id}/books/{book_id}`.
   // The name is ignored when creating a book.
-  string book_id = 1;
+  string book_id = 1 [
+    (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
+      max_length: 20,
+      min_length: 0
+    }
+  ];
 
   // The name of the book author.
   string author = 2;
@@ -420,8 +471,9 @@ message CreateShelfRequest {
     }
 };
   // The shelf to create.
-  Shelf shelf = 1[(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
-    required: "true"
+  repeated Shelf shelf = 1[(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
+      min_items: 1,
+      max_items: 400
     }];
 
   // First category for the shelf.
@@ -548,6 +600,12 @@ message MoveBookRequest {
   // The name of the book to move.
   string name = 1;
 
-  // The name of the destination shelf.
-  string other_shelf_name = 2;
+  oneof oneof_shelf{
+    // The name of the destination shelf.
+    string other_shelf_name = 2;
+
+    // The id of the destination shelf
+    string other_shelf_id = 3;
+  }
+
 }
