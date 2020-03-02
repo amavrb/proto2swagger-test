@@ -46,101 +46,11 @@ Availiable options are:
 
 This section will contain the combined tables of each annotation option that has been tested.
 
-The **key** column represents the swagger key in the swagger file.
+The **key** column represents the JSON/YAML key in the swagger file.
 
 ### Swagger
 
 The general options for the swagger file.
-
-Example:
-```java
-option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
-  info: {
-    title: "Library Example API";
-    version: "1.0";
-    description: "Awesome API description right here. Could be longer, could be shorter."
-  };
-  [...]
-}
-```
-
-| Key                  | Proto | Result OAS2                        | Result readme                           | Ok  | Notes                                                                         |
-| :--:                 | :---: | :---------:                        | :-----------:                           | :-: | --                                                                            |
-| info                 | -     | ![key info](./images/info_key.png) | ![key result](./images/info_readme.png) |     | If used, description needs to be set. Otherwise shows as undefined in readme. |
-| securityDefinitions | -     | ![](./images/sec-def-key.png)      | See next                             |     |                                                                               |
-| security             | -     | ![](./images/sec-key.png)          | ![](./images/sec-result.png)            |     | Does not work well - looking at the example code shows `--header 'authorization: {token}'`, should be `--header 'authorization: Bearer {token}'`. |
-| host and basepath    | -     | ![](./images/host-bp-key.png)      | ![](./images/host-bp-result.png)        |     |
-| extensions   |   |   |   | Y  | Works well.  |
-
-### Method
-
-We go thorugh the method options, or operation options, here.
-
-Example
-
-```java
-rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
-  option (google.api.http) = {
-    get: "/v1/shelves/{name}/books"
-  };
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    [...]
-  };
-}
-```
-
-| Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
-| :--: | :---: | :---------: | :-----------: | :-: | -- |
-| tags   | - | ![](./images/tags-key.png)  | ![](./images/tags-res.png) | Y | |
-| responses | 200 | ![](./images/response-200.png) | ![](./images/response-200-res1.png) |   |   |
-| responses   | 200 | See above  |  ![](./images/response-201-res2.png) |   |   |
-| responses   | 503 |  ![](./images/response-503.png) | ![](./images/response-503-res.png)  |   |   |
-| deprecated    | -     | As expected                                     | No indication of it being deprecated | N   |                                          |
-| description   | -     | As expected but overwrites description in proto |                                      |     | Should probably use description in proto |
-| externalDocs | -     | Shows in OAS2                                   | Is not shown in readme               |     |                                          |
-| summary       | -     | Overwrites summary set in proto |                                      |     |                                          |
-
-### Message
-
-| Key         | Proto                     | Result OAS2 | Result readme                   | Ok  | Notes                                      |
-| :--:        | :---:                     | :---------: | :-----------:                   | :-: | --                                         |
-| title       | The book                  | -           | ![](./images/book-s-v2-res.png) |     | Should use proto to set title, not options |
-| description | Sets a new description... | -           | See above                       |     | Should use proto to set title, not options |
-| required    | -                         | -           | See above                       |     | Currently seems to be the best way to set required fields. |
-| example |       | As expected | Not shown, shows in Swagger UI |     | ![](./images/book-ex-swui.png) |
-| externalDocs | -     | As expected | Does not show | N   |       |
-
-### Service
-
-**missing**
-
-### Field
-| Key         | Proto                     | Result OAS2 | Result readme                   | Ok  | Notes                                      |
-| :--:        | :---:                     | :---------: | :-----------:                   | :-: | --                                         |
-| required   |   |   |   |  N  | Is not supported for properties in OAS2/OAS3 |
-| description   | |   |   | Y  |   |
-|  minItems/maxItems  |   | ![](./images/array-min-max-res.png)  |   |  N  |  |
-|   maxLength/maxItems | |   |   |  N |  Not supported in readme |
-| enum   | -  | |   |   |  Contains the proto default value, field 0 in the enum (i.e. *UNKNOWN_*)   |
-
-#### FieldMask
-
-The swagger generation ignores fields in a message containing `google.protobuf.FieldMask <field_name>`.
-
-#### OneOf
-
-Is not supported by the swagger generation tool.
-
-It will list the `oneof` properties from the proto as properties in the OAS2 file.
-
-# Testing
-
-These are the `.proto` annotations used to set different options, and in the table below, the results.
-
-## File Options
-
-Should go directly beneath the import and option statements at the top level.
-These options set properties of the swagger file.
 
 ```java
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
@@ -159,7 +69,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
       }
     }
   }
-  security: { //Global security
+  security: {
     security_requirement: {
       key: "Bearer";
       value: {};
@@ -170,7 +80,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
   extensions: {
     key: "x-explorer-enabled"
     value {
-      bool_value: true;
+      bool_value: false;
     }
   }
   extensions: {
@@ -182,37 +92,15 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 };
 ```
 
-| Key                  | Proto | Result OAS2                        | Result readme                           | Ok  | Notes                                                                         |
-| :--:                 | :---: | :---------:                        | :-----------:                           | :-: | --                                                                            |
-| info                 | -     | ![key info](./images/info_key.png) | ![key result](./images/info_readme.png) |     | If used, description needs to be set. Otherwise shows as undefined in readme. |
-| securityDefinitions | -     | ![](./images/sec-def-key.png)      | See next                             |     |                                                                               |
-| security             | -     | ![](./images/sec-key.png)          | ![](./images/sec-result.png)            |     | Does not work well - looking at the example code shows `--header 'authorization: 3543645645'`, should be `--header 'authorization: Bearer 3543645645'`. |
-| host and basepath    | -     | ![](./images/host-bp-key.png)      | ![](./images/host-bp-result.png)        |     |                                                                               |
+![key result](./images/info_readme.png)
+![](./images/sec-result.png)
+![](./images/host-bp-result.png)
 
-### Other
+### Method
 
-Any important ones missing?
+We go thorugh the method options, or operation options, here.
 
-## Method Options
-
-### Tags
-
-```java
-rpc GetShelf(GetShelfRequest) returns (Shelf) {
-  option (google.api.http) = {
-    get: "/v1/{name}"
-  };
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    tags: "Shelves";
-  };
-}
-```
-
-| Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
-| :--: | :---: | :---------: | :-----------: | :-: | -- |
-| tags   | - | ![](./images/tags-key.png)  | ![](./images/tags-res.png) | Y | |
-
-### Responses
+#### Responses
 
 ```java
 rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
@@ -231,6 +119,15 @@ rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
       }
     }
     responses: {
+      key: "201";
+      value: {
+        examples: {
+          key: "application/json"
+          value: '{"books": [{"name": "books/34324","author": "Unknows artist","title": "The dancing flower","read": false},{"name": "books/34334354","author": "Artist","title": "The dancing","read": false}],"next_page_token":"3fsafe3af"}'
+        }
+      }
+    }
+    responses: {
       key: "503";
       value: {
         description: "Returned when the resource is temp. unavailable.";
@@ -240,15 +137,35 @@ rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
 }
 ```
 
-| Key | Code | Result OAS2 | Result readme |  Ok | Notes |
-| :--: | :---: | :---------: | :-----------: | :-: | -- |
-| responses | 200 | ![](./images/response-200.png) | ![](./images/response-200-res1.png) |   |   |
-| responses   | 200 | See above  |  ![](./images/response-201-res2.png) |   |   |
-| responses   | 503 |  ![](./images/response-503.png) | ![](./images/response-503-res.png)  |   |   |
+![](./images/response-200-res1.png)
+![](./images/response-503-res.png)
 
-### Others
+#### Tags
 
 ```java
+rpc GetShelf(GetShelfRequest) returns (Shelf) {
+  option (google.api.http) = {
+    get: "/v1/{name}"
+  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    tags: "Shelves";
+  };
+}
+```
+
+![](./images/tags-res.png)
+
+#### deprecated
+
+Now showing in readme.
+
+#### description
+
+```java
+// Move book
+//
+// Moves a book to another shelf, and returns the new book. The book
+// id of the new book may not be the same as the original book.
 rpc MoveBook(MoveBookRequest) returns (Book) {
   option (google.api.http) = {
     post: "/v1/shelves/books/{name}:move"
@@ -256,8 +173,6 @@ rpc MoveBook(MoveBookRequest) returns (Book) {
   };
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     tags: "Books";
-    deprecated: true;
-    summary: "Move"
     description: "Description MoveBook"; //Overwrites description in proto
     external_docs: {
       url: "https://developers.sinch.com/docs";
@@ -267,25 +182,38 @@ rpc MoveBook(MoveBookRequest) returns (Book) {
 }
 ```
 
-| Key           | Proto | Result OAS2                                     | Result readme                        | Ok  | Notes                                    |
-| :--:          | :---: | :---------:                                     | :-----------:                        | :-: | --                                       |
-| deprecated    | -     | As expected                                     | No indication of it being deprecated | N   |                                          |
-| description   | -     | As expected but overwrites description in proto |                                      |     | Should probably use description in proto |
-| externalDocs | -     | Shows in OAS2                                   | Is not shown in readme               |     |                                          |
-| summary       | -     | Overwrites summary set in proto |                                      |     |                                          |
 
-Probably better to use the proto to set summary and description.
+Will have the description `"Description MoveBook"` instead of `Moves a book to another shelf, and returns the new book. The book id of the new book may not be the same as the original book.`.
+
+#### externalDocs
+
+Are not shown in readme.
+
+#### summary
 
 ```java
-// Move book <-- set summary in OAS2
+// Move book
 //
 // Moves a book to another shelf, and returns the new book. The book
-// id of the new book may not be the same as the original book. <-- description in OAS2
+// id of the new book may not be the same as the original book.
+rpc MoveBook(MoveBookRequest) returns (Book) {
+  option (google.api.http) = {
+    post: "/v1/shelves/books/{name}:move"
+    body: "*"
+  };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    tags: "Books";
+    summary: "Move book to another shelf"
+  };
+}
 ```
+Overwrites `Move book` with `Move book to another shelf`.
 
-## Message Options
+### Message
 
-### No options
+The options that are availible for `proto` messages.
+
+#### No options
 
 ```java
 // A book
@@ -312,65 +240,44 @@ message Book {
 }
 ```
 
-| Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
-| :--: | :---: | :---------: | :-----------: | :-: | -- |
-|  title | A book |   | ![](./images/book-s-v1-res.png)  |   |   |
-| description   | A single book in the library  |   | See above  |   |   |
+![](./images/book-s-v1-res.png)
 
-### Set title, description and required fields
-
+Example with options:
 ```java
 // A book
 //
 // A single book in the library.
 message Book {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    json_schema: {
-        title: "The book"
-        description: "Sets a new description in the swagger. Overwrites the previous one"
-        required: ["book_id", "title"]
-    }
-};
-  option (google.api.resource) = {
-    type: "library-example.googleapis.com/Book",
-    pattern: "shelves/{shelf_id}/books/{book_id}"
+    json_schema:{
+      title: "The book",
+      description: "Book in the lib",
+      required: ["book_id", "title"],
+      }
   };
-  [...]
-}
-```
-
-| Key         | Proto                     | Result OAS2 | Result readme                   | Ok  | Notes                                      |
-| :--:        | :---:                     | :---------: | :-----------:                   | :-: | --                                         |
-| title       | The book                  | -           | ![](./images/book-s-v2-res.png) |     | Should use proto to set title, not options |
-| description | Sets a new description... | -           | See above                       |     | Should use proto to set title, not options |
-| required    | -                         | -           | See above                       |     | Currently seems to be the best way to set required fields. |
-
-### external docs
-
-```java
-// A book
-//
-// A single book in the library.
-message Book {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    external_docs: {
-			url: "https://developers.sinch.com/docs";
-			description: "Find out more about Book";
-		}
-};
   option (google.api.resource) = {
     type: "library-example.googleapis.com/Book",
     pattern: "shelves/{shelf_id}/books/{book_id}"
   };
 
-  [...]
+  // Other properties
 }
 ```
-| Key          | Proto | Result OAS2 | Result readme | Ok  | Notes |
-| :--:         | :---: | :---------: | :-----------: | :-: | --    |
-| externalDocs | -     | As expected | Does not show | N   |       |
 
-### example
+#### title, description, required
+
+![](./images/book-s-v2-res.png)
+
+Probably better to use the proto to set summary and description.
+
+```java
+// Move book <-- set summary in OAS2
+//
+// Moves a book to another shelf, and returns the new book. The book
+// id of the new book may not be the same as the original book. <-- description in OAS2
+```
+
+#### example
 
 ```java
 // A book
@@ -378,74 +285,79 @@ message Book {
 // A single book in the library.
 message Book {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema:{...}
     example: {
       value: '{"book_id": "3894jksla8HSa", "author": "Martin L. King", "title": "A few words about...", "read": "false"}'
     }
-};
+  };
   option (google.api.resource) = {
     type: "library-example.googleapis.com/Book",
     pattern: "shelves/{shelf_id}/books/{book_id}"
   };
-  [...]
+
+  // Other properties
 }
+
 ```
 
-| Key     | Proto | Result OAS2 | Result readme                  | Ok  | Notes          |
-| :--:    | :---: | :---------: | :-----------:                  | :-: | --             |
-| example |       | As expected | Not shown, shows in Swagger UI |     | ![](./images/book-ex-swui.png) |
+Does not show in readme.
 
-## Service Options
-
-These should work, but they are not in the generated swagger file.
-
-```java
-service LibraryService {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_tag) = {
-    description: "This will overwrite the description of the service in OAS2"
-    external_docs: {
-      url: "developers.sinch.com"
-      description: "Find out more about Sinch find a number in a book! It's awsome!!"
-    }
-  };
-  [...]
-
-}
-```
-
-| Key        | Proto | Result OAS2 | Result readme | Ok  | Notes |
-| :--:        | :---: | :---------: | :-----------: | :-: | --    |
-| **missing** | -     | -           | -             | -   |- |
-
-## Field Options
-
-### required and description
+#### externalDocs
 
 ```java
 // A book
 //
 // A single book in the library.
 message Book {
-  [...]
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema:{...}
+    external_docs: {
+      url: "https://github.com/grpc-ecosystem/grpc-gateway";
+      description: "Find out more about ABitOfEverything";
+    }
+  };
+  option (google.api.resource) = {
+    type: "library-example.googleapis.com/Book",
+    pattern: "shelves/{shelf_id}/books/{book_id}"
+  };
+
+  // Other properties
+}
+
+```
+
+Works but does not show in readme.
+
+### Service
+
+**missing**
+
+### Field
+
+```java
+// A book
+//
+// A single book in the library.
+message Book {
+  option (google.api.resource) = {
+    type: "library-example.googleapis.com/Book",
+    pattern: "shelves/{shelf_id}/books/{book_id}"
+  };
   // The resource name of the book.
   // Book names have the form `shelves/{shelf_id}/books/{book_id}`.
   // The name is ignored when creating a book.
   string book_id = 1 [
     (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
-      description: "Resource name of the book. Overwrites description from proto"
-      required: ['book_id']
+      [...]
     }
   ];
 
-  [...]
+  // Other properties
 }
 ```
 
-| Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
-| :--: | :---: | :---------: | :-----------: | :-: | -- |
-| required   |   |   |   |  N  | Is not supported for properties in OAS2/OAS3 |
-| description   | |   |   | Y  |   |
 
-### array minItems, maxItems
+#### array, minItems, maxItems, maxLength, minLength
 
 ```java
 // Request message for LibraryService.CreateShelf.
@@ -466,12 +378,11 @@ message CreateShelfRequest {
 }
 ```
 
-| Key | Proto | Result OAS2 | Result readme |  Ok | Notes |
-| :--: | :---: | :---------: | :-----------: | :-: | -- |
-|  minItems/maxItems  |   | ![](./images/array-min-max-res.png)  |   |  N  |  |
-|   maxLength/maxItems | |   |   |  N |  Not supported in readme |
+minItems, maxItems, maxLength, minLength are not rendered by readme.
 
-### enums
+![](./images/array-min-max-res.png)
+
+#### enums
 
 Removing the safe default option is not possible at the moment.
 
@@ -501,7 +412,7 @@ Output:
 
 Expected:
 
-```java
+```json
 "Type": {
   "type": "string",
   "enum": [
@@ -511,7 +422,9 @@ Expected:
 }
 ```
 
-## FieldMask
+Not working as we want it to.
+
+#### FieldMask
 
 If we want to use a FieldMask to do a partial update we would for example do something like this:
 
@@ -617,7 +530,7 @@ Which then results in the OAS2, not containing the `update_mask` field:
 },
 ```
 
-## oneof
+#### oneof
 
 Example proto:
 
@@ -662,8 +575,4 @@ Resulting OAS2:
 },
 ```
 
-
-
-## Bonus
-
-### Auto generated table
+![](./images/one-of-res.png)
