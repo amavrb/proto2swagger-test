@@ -48,6 +48,31 @@ This section will contain the combined tables of each annotation option that has
 
 The **key** column represents the JSON/YAML key in the swagger file.
 
+## Summary table
+
+|Swagger|Working| Notes |
+| --- | :---: | ---- |
+|Change title to the API   | Y  | |
+| Add a description to the API  | Y  | |
+| Add security definitions   | Y  |   |
+| Add host   | Y  |  Swagger 2.0 does not support more than one server per API |
+| Add extensions   |  Y |  Needs to be supported by the rendering tool |
+| Custom responses (400, 401 etc.)  |  Y | This works but is very cumbersome and prone to error. Should be avoided unless necessary.  |
+| Adding tags (Operation tags)   |  Y  | Easy to add and looks a lot better when used on all operations  |
+| Deprecated   | N  | Not rendered in readme  |
+| Description of operation   | Y  | Can be added without adding an option to the operation. Always end description with an `.`  |
+| External docs   | N  | Not rendered in readme  |
+| summary of an operation   | Y  | Can be added without adding an option to the operation.  |
+| Description of a message   | Y  |  Can be added without adding an option to the message. |
+| Title of a message   |  Y  | Can be added without adding an option to the message.  |
+| example for message   | N   | Not rendered in readme  |
+| external docs for a message    | N  | Not rendered in readme.  |
+| FieldMask field   | Y  | Not rendered in readme, as it should  |
+| enums   | N  | The default 0 field in the proto is included in the Swagger file. I.e. `UNKNOWN_TYPE`  |
+| array field   | Y  |   |
+| minItems, maxItems of an array   | N  | Not rendered in readme  |
+| maxLength, minLength   | N  | Not rendered in readme  |
+
 ### Swagger
 
 The general options for the swagger file.
@@ -98,7 +123,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 
 ### Method
 
-We go thorugh the method options, or operation options, here.
+We go through the method options, or operation options, here.
 
 #### Responses
 
@@ -211,7 +236,7 @@ Overwrites `Move book` with `Move book to another shelf`.
 
 ### Message
 
-The options that are availible for `proto` messages.
+The options that are available for `proto` messages.
 
 #### No options
 
