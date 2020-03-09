@@ -46,8 +46,6 @@ Availiable options are:
 
 This section will contain the combined tables of each annotation option that has been tested.
 
-The **key** column represents the JSON/YAML key in the swagger file.
-
 ## Summary table
 
 | Swagger | Working | Notes |
