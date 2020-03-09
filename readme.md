@@ -50,10 +50,11 @@ The **key** column represents the JSON/YAML key in the swagger file.
 
 ## Summary table
 
-|Swagger|Working| Notes |
+| Swagger | Working | Notes |
 | --- | :---: | ---- |
-|Change title to the API   | Y  | |
+| Change title to the API   | Y  | |
 | Add a description to the API  | Y  | |
+| Add a description to a tag (i.e. *Books*) globally | N  | Not supported in protoc-gen-swagger  |
 | Add security definitions   | Y  |   |
 | Add host   | Y  |  Swagger 2.0 does not support more than one server per API |
 | Add extensions   |  Y |  Needs to be supported by the rendering tool |
